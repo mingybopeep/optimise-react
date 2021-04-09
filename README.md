@@ -41,7 +41,7 @@ All other routes make use of an authentication middleware to deserialise the tok
 
 ## Database
 Here is the schema for the database: 
-
+```
 create table Users (
 	username VARCHAR(255) NOT NULL, 
     password VARCHAR(255) NOT NULL, 
@@ -69,3 +69,4 @@ create table Todos (
     foreign key (creator) references Users(username) on delete cascade
 );
 
+```
