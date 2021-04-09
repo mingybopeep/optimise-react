@@ -39,5 +39,33 @@ password is compared to encrypted version stored in db using bcrypt, if it match
 ### All other routes
 All other routes make use of an authentication middleware to deserialise the token and check it's validity. Otherwise a fail response is sent. Successful requests are then passed onto the next callback in the route, with the username of the user associated with the token appended to the request body. 
 
+## Database
+Here is the schema for the database: 
 
+create table Users (
+	username VARCHAR(255) NOT NULL, 
+    password VARCHAR(255) NOT NULL, 
+    PRIMARY KEY (username)
+); 
+
+create table Lists (
+	list_id int not null auto_increment, 
+    list_name varchar(255) not null,
+    creator VARCHAR(255) not null, 
+    primary key (list_id), 
+    foreign key (creator) references Users(username) on delete cascade
+);
+
+create table Todos (
+	todo_id int not null auto_increment, 
+	todo_name varchar(255) not null, 
+	todo_description varchar(255) not null, 
+    todo_deadline DATE not null, 
+    parent_list int not null, 
+    creator VARCHAR(255) not null,
+    completed TINYINT(1) DEFAULT 0,
+    primary key (todo_id), 
+    foreign key (parent_list) references Lists(list_id) on delete cascade,
+    foreign key (creator) references Users(username) on delete cascade
+);
 
