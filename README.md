@@ -1,46 +1,43 @@
-# Getting Started with Create React App
+# Application overview
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## front end components
+### Home  
+The home component houses all the other components. The first interaction a user will have with the home component is the display of a child sub component which prompts for user registration or login. 
 
-## Available Scripts
+upon successful login, the user token is received from the REST API and stored in the global state using react context API.
 
-In the project directory, you can run:
+When the token is present, the login component unmounts, and the todolist/ create list components mount.
 
-### `npm start`
+### List
+The List, upon mount (useEffect), makes calls to the api to request the lists and user todos, using the token from the global state. Once the data is received, todo lists are displayed. 
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+The nature of this application is such that data is dynamic, and therefore it is likely that updated information will need to be fetched, therefore the useEffect call also includes a piece of state called 'update' within the dependency array, so that when child components make a successful request via FetchButton, the update state is modified, triggering the useEffect call to request fresh data. 
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+### Fetch button component
+This project makes heavy usage of buttons to fire http requests to the API, and so I have created a component to prevent repetitive code. 
 
-### `npm test`
+The component makes requests using axios internally. In the event of error an error is displayed. In the event of success, a setter function is called, the intended purpose being to tell parent components to update, as the data has incurred an update (see List component update state)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+This component takes as props: 
+- label
+- disabled (bool)
+- url: url to request
+- method: the type of request
+- setter: upon successful request (200) response, function to call
 
-### `npm run build`
+## back end 
+I have used express.js to build the backend for this project. 
+Data is stored using a mysql db. 
+There are several endpoints made available: 
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### post /signup
+password is hashed using bcrypt and stored in database
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### post /login
+password is compared to encrypted version stored in db using bcrypt, if it matches, a JWT is created and sent as response.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### All other routes
+All other routes make use of an authentication middleware to deserialise the token and check it's validity. Otherwise a fail response is sent. Successful requests are then passed onto the next callback in the route, with the username of the user associated with the token appended to the request body. 
 
-### `npm run eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
